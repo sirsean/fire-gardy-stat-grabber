@@ -1,5 +1,6 @@
 
 This is the FireGardy Baseball-Reference Stat Grabber.
+http://stat-grabber.firegardy.com
 
 It downloads a hitter's stats from his baseball-reference.com page, and
 displays some basic statistics on your page.
@@ -19,7 +20,7 @@ Step one: Find out Punto's B-R player code.
 Step two: Edit sidebar.php
 	Find the spot you want to display the stat block, and add this line:
 
-	<?php fg_baseball_reference_grabber('Nick Punto', 'puntoni01', 2008); ?>
+	<?php fire_gardy_stat_grabber('Nick Punto', 'puntoni01', 2008); ?>
 
 	Make sure you put that line somewhere on the page that will be displayed.
 	(IE, beware of parts of the sidebar that are only displayed on the home
