@@ -3,7 +3,7 @@
 Plugin Name: FireGardy Stat Grabber
 Plugin URI: http://stat-grabber.firegardy.com
 Description: Download a player's stats from Baseball-Reference.com and display them on the page.
-Version: 0.1a
+Version: 0.1.1a
 Author: Sean Schulte
 Author URI: http://seancode.blogspot.com
 */
