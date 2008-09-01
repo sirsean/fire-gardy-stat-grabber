@@ -26,6 +26,14 @@ Step two: Edit sidebar.php
 	(IE, beware of parts of the sidebar that are only displayed on the home
 	page, et cetera.)
 
+	Advanced:
+		You can specify what stats get displayed on your page. By omitting the 4th
+		parameter, you specify the default:
+			array('tripleSlash', array('ab', 'hr'), 'opsPlus')
+		If you want to add to that you can enter, for example:
+			<?php fire_gardy_stat_grabber('Nick Punto', 'puntoni01', 2008,
+				array('tripleSlash', array('ab', 'hr'), array('k', 'bb'), 'opsPlus')); ?>
+
 Step three: Go to your blog and check it out! Punto's stats should be displayed
 		somewhere in your sidebar!
 
