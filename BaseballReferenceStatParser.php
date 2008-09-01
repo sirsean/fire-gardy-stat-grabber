@@ -2,7 +2,79 @@
 
 class PlayerStats {
 	var $time;
-	var $year, $age, $games, $ab, $runs, $hits, $doubles, $triples, $hr, $rbi, $sb, $cs, $bb, $so, $ba, $obp, $slg, $opsPlus;
+	var $year, $age, $games;
+}
+
+class PitcherStats extends PlayerStats {
+	var $w, $l, $gs, $cg, $sho, $gf, $sv, $ip, $h, $r, $er, $hr, $bb, $so, $hbp, $wp, $bfp, $ibb, $bk, $era, $eraPlus, $whip;
+
+	/**
+	Translate a given stat string into a printable string.
+	Acceptable inputs:
+		year, age, g, w, l, gs, cg, sho, gf, sv, ip, h, r, er, hr, bb, so, hbp, wp, bfp, ibb, bk, era, eraPlus, whip;
+	*/
+	function getString($stat) {
+		switch($stat) {
+			case 'year':
+				return $this->year;
+			case 'age':
+				return $this->age . ' years';
+			case 'g':
+				return $this->games . ' G';
+			case 'gs':
+				return $this->gs . ' GS';
+			case 'w':
+				return $this->w . ' W';
+			case 'l':
+				return $this->l . ' L';
+			case 'winLoss':
+				return $this->w . '-' . $this->l;
+			case 'cg':
+				return $this->cg . ' CG';
+			case 'sho':
+				return $this->sho . ' SHO';
+			case 'gf':
+				return $this->gf . ' GF';
+			case 'sv':
+				return $this->sv . ' SV';
+			case 'ip':
+				return $this->ip . ' IP';
+			case 'h':
+				return $this->h . ' H';
+			case 'r':
+				return $this->r . ' R';
+			case 'er':
+				return $this->er . ' ER';
+			case 'hr':
+				return $this->hr . ' HR';
+			case 'bb':
+				return $this->bb . ' BB';
+			case 'k':
+				return $this->so . ' K';
+			case 'hbp':
+				return $this->hbp . ' HBP';
+			case 'wp':
+				return $this->wp . ' WP';
+			case 'bfp':
+				return $this->bfp . ' BFP';
+			case 'ibb':
+				return $this->ibb . ' IBB';
+			case 'bk':
+				return $this->bk . ' BK';
+			case 'era':
+				return $this->era . ' ERA';
+			case 'eraPlus':
+				return $this->eraPlus . ' ERA+';
+			case 'whip':
+				return $this->whip . ' WHIP';
+			default:
+				return '';
+		}
+	}
+}
+
+class HitterStats extends PlayerStats {
+	var $ab, $runs, $hits, $doubles, $triples, $hr, $rbi, $sb, $cs, $bb, $so, $ba, $obp, $slg, $opsPlus;
 
 	/**
 	Translate a given stat name into a printable string
@@ -70,13 +142,16 @@ $stats = $fetcher->getStats();
 class StatFetcher {
 	var $url;
 	var $htmlLines = null;
+	var $playerType;
 
-	function StatFetcher($playerCode, $year) {
+	function StatFetcher($playerCode, $year, $playerType='hitter') {
 		$this->playerCode = $playerCode;
 		$this->year = $year;
 
 		// build the URL based on the format of the baseball-reference URLs
 		$this->url = 'http://www.baseball-reference.com/' . $playerCode[0] . '/' . $playerCode . '.shtml';
+
+		$this->playerType = $playerType;
 	}
 
 	/**
@@ -95,9 +170,9 @@ class StatFetcher {
 	}
 
 	/**
-	Given a line containing a year's stats, parse them into a PlayerStats object.
+	Given a line containing a year's stats, parse it into a PitcherStats object.
 	*/
-	function parsePlayerStats($line) {
+	function parsePitcherStats($line) {
 		$arr = split(' ', $line);
 		$numbers = array();
 		foreach ($arr as $elem) {
@@ -106,7 +181,51 @@ class StatFetcher {
 			}
 		}
 
-		$stats = new PlayerStats();
+		$stats = new PitcherStats();
+		$stats->time = time();
+
+		$stats->year = $numbers[0];
+		$stats->age = $numbers[1];
+		$stats->w = $numbers[2];
+		$stats->l = $numbers[3];
+		$stats->games = $numbers[4];
+		$stats->gs = $numbers[5];
+		$stats->cg = $numbers[6];
+		$stats->sho = $numbers[7];
+		$stats->gf = $numbers[8];
+		$stats->sv = $numbers[9];
+		$stats->ip = $numbers[10];
+		$stats->h = $numbers[11];
+		$stats->r = $numbers[12];
+		$stats->er = $numbers[13];
+		$stats->hr = $numbers[14];
+		$stats->bb = $numbers[15];
+		$stats->so = $numbers[16];
+		$stats->hbp = $numbers[17];
+		$stats->wp = $numbers[18];
+		$stats->bfp = $numbers[19];
+		$stats->ibb = $numbers[20];
+		$stats->bk = $numbers[21];
+		$stats->era = $numbers[22];
+		$stats->eraPlus = $numbers[24];
+		$stats->whip = $numbers[25];
+
+		return $stats;
+	}
+
+	/**
+	Given a line containing a year's stats, parse them into a HitterStats object.
+	*/
+	function parseHitterStats($line) {
+		$arr = split(' ', $line);
+		$numbers = array();
+		foreach ($arr as $elem) {
+			if (is_numeric($elem)) {
+				$numbers[] = $elem;
+			}
+		}
+
+		$stats = new HitterStats();
 		$stats->time = time();
 
 		$stats->year = $numbers[0];
@@ -139,14 +258,22 @@ class StatFetcher {
 
 		$batStat = false;
 		foreach ($this->htmlLines as $line) {
-			if (strcasecmp('<div id="batStats">', trim($line)) == 0) {
+			if (($this->playerType == 'hitter') && strcasecmp('<div id="batStats">', trim($line)) == 0) {
 				$batStat = true;
+				continue;
+			} else if (($this->playerType == 'pitcher') && strcasecmp('<div id="pitchStats">', trim($line)) == 0) {
+				$pitchStat = true;
 				continue;
 			}
 
 			if ($batStat) {
 				if (preg_match("/year=\"{$this->year}\"/", $line)) {
-					return $this->parsePlayerStats($line);
+					return $this->parseHitterStats($line);
+				}
+			}
+			if ($pitchStat) {
+				if (preg_match("/year=\"{$this->year}\"/", $line)) {
+					return $this->parsePitcherStats($line);
 				}
 			}
 		}

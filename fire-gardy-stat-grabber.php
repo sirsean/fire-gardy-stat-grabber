@@ -3,7 +3,7 @@
 Plugin Name: FireGardy Stat Grabber
 Plugin URI: http://stat-grabber.firegardy.com
 Description: Download a player's stats from Baseball-Reference.com and display them on the page.
-Version: 0.1.1a
+Version: 0.1.2a
 Author: Sean Schulte
 Author URI: http://seancode.blogspot.com
 */
@@ -12,16 +12,23 @@ Author URI: http://seancode.blogspot.com
 require_once(dirname(__FILE__) . '/BaseballReferenceStatParser.php');
 
 /**
-Take a player name, player code, year, and an optional set of stats to display, and show the stats for that player.
+Take a player name, player code, year, the player type, and an optional set of stats to display, and show the stats for that player.
+The playerType parameter must be either 'hitter' or 'pitcher' (if it's omitted, it defaults to 'hitter').
 The statsToDisplay parameter is an array, whose contents are either strings or arrays of strings. Each element in the array is displayed on a single line.
-The default is:
-array(
-'tripleSlash',
-array('ab', 'hr'),
-'opsPlus'
-);
+The default for hitters is:
+	array(
+		'tripleSlash',
+		array('ab', 'hr'),
+		'opsPlus'
+	);
+The default for pitchers is:
+	$statsToDisplay = array(
+		'winLoss',
+		array('ip', 'k', 'bb'),
+		array('era', 'eraPlus')
+		);
 */
-function fire_gardy_stat_grabber($playerName, $playerId, $year, $statsToDisplay=null) {
+function fire_gardy_stat_grabber($playerName, $playerId, $year, $playerType='hitter', $statsToDisplay=null) {
 	// build the player db code
 	$playerDbCode = $playerId . '_' . $year . '_' . date('m-d-Y');
 
@@ -30,7 +37,7 @@ function fire_gardy_stat_grabber($playerName, $playerId, $year, $statsToDisplay=
 
 	// download a new one if this is the first of the day or it hasn't been downloaded for over 4 hours
 	if (!$playerStats || (time() - $playerStats->time > 4*3600)) {
-		$fetcher = new StatFetcher($playerId, $year);
+		$fetcher = new StatFetcher($playerId, $year, $playerType);
 		$playerStats = $fetcher->getStats();
 
 		// save it to the db
@@ -39,11 +46,19 @@ function fire_gardy_stat_grabber($playerName, $playerId, $year, $statsToDisplay=
 
 	// set up the default stats
 	if (!$statsToDisplay) {
-		$statsToDisplay = array(
-			'tripleSlash',
-			array('ab', 'hr'),
-			'opsPlus'
-			);
+		if ($playerType == 'hitter') {
+			$statsToDisplay = array(
+				'tripleSlash',
+				array('ab', 'hr'),
+				'opsPlus'
+				);
+		} else if ($playerType == 'pitcher') {
+			$statsToDisplay = array(
+				'winLoss',
+				array('ip', 'k', 'bb'),
+				array('era', 'eraPlus')
+				);
+		}
 	}
 
 	// display the stats
@@ -66,13 +81,6 @@ function fire_gardy_stat_grabber($playerName, $playerId, $year, $statsToDisplay=
 		}
 		echo '<br />';
 	}
-	/*
-	echo $playerStats->ba . '/' . $playerStats->obp . '/' . $playerStats->slg;
-	echo '<br />';
-	echo $playerStats->ab . ' AB, ' . $playerStats->hr . ' HR';
-	echo '<br />';
-	echo $playerStats->opsPlus . ' OPS+';
-	*/
 	echo '</div>';
 }
 
