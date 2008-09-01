@@ -11,7 +11,17 @@ Author URI: http://seancode.blogspot.com
 // we need to use the parser
 require_once(dirname(__FILE__) . '/BaseballReferenceStatParser.php');
 
-function fire_gardy_stat_grabber($playerName, $playerId, $year) {
+/**
+Take a player name, player code, year, and an optional set of stats to display, and show the stats for that player.
+The statsToDisplay parameter is an array, whose contents are either strings or arrays of strings. Each element in the array is displayed on a single line.
+The default is:
+array(
+'tripleSlash',
+array('ab', 'hr'),
+'opsPlus'
+);
+*/
+function fire_gardy_stat_grabber($playerName, $playerId, $year, $statsToDisplay=null) {
 	// build the player db code
 	$playerDbCode = $playerId . '_' . $year . '_' . date('m-d-Y');
 
@@ -27,15 +37,42 @@ function fire_gardy_stat_grabber($playerName, $playerId, $year) {
 		update_option($playerDbCode, $playerStats);
 	}
 
+	// set up the default stats
+	if (!$statsToDisplay) {
+		$statsToDisplay = array(
+			'tripleSlash',
+			array('ab', 'hr'),
+			'opsPlus'
+			);
+	}
+
 	// display the stats
 	echo '<div class="fg_br_grabber">';
 	echo '<strong>' . $playerName . ', ' . $year . '</strong>';
 	echo '<br />';
+	foreach ($statsToDisplay as $stat) {
+		if (is_array($stat)) {
+			$comma = false;
+			foreach ($stat as $s) {
+				if ($comma) {
+					echo ', ';
+				} else {
+					$comma = true;
+				}
+				echo $playerStats->getString($s);
+			}
+		} else {
+			echo $playerStats->getString($stat);
+		}
+		echo '<br />';
+	}
+	/*
 	echo $playerStats->ba . '/' . $playerStats->obp . '/' . $playerStats->slg;
 	echo '<br />';
 	echo $playerStats->ab . ' AB, ' . $playerStats->hr . ' HR';
 	echo '<br />';
 	echo $playerStats->opsPlus . ' OPS+';
+	*/
 	echo '</div>';
 }
 

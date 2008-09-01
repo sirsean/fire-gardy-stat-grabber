@@ -3,6 +3,58 @@
 class PlayerStats {
 	var $time;
 	var $year, $age, $games, $ab, $runs, $hits, $doubles, $triples, $hr, $rbi, $sb, $cs, $bb, $so, $ba, $obp, $slg, $opsPlus;
+
+	/**
+	Translate a given stat name into a printable string
+	Accepted stats:
+		tripleSlash, ba, obp, slg, ops, ab, hr, opsPlus, age, year, g, r, h, 2B, 3B, rbi, sb, cs, bb, k
+	*/
+	function getString($stat) {
+		switch($stat) {
+			case 'tripleSlash':
+				return $this->ba . '/' . $this->obp . '/' . $this->slg;
+			case 'ba':
+				return $this->ba . ' BA';
+			case 'obp':
+				return $this->obp . ' OBP';
+			case 'slg':
+				return $this->slg . ' SLG';
+			case 'ops':
+				return ($this->obp + $this->slg) . ' OPS';
+			case 'ab':
+				return $this->ab . ' AB';
+			case 'hr':
+				return $this->hr . ' HR';
+			case 'opsPlus':
+				return $this->opsPlus . ' OPS+';
+			case 'age':
+				return $this->age . ' years';
+			case 'year':
+				return $this->year;
+			case 'g':
+				return $this->games . ' G';
+			case 'r':
+				return $this->runs . ' R';
+			case 'h':
+				return $this->hits . ' H';
+			case '2b':
+				return $this->doubles . ' 2B';
+			case '3b':
+				return $this->triples . ' 3B';
+			case 'rbi':
+				return $this->rbi . ' RBI';
+			case 'sb':
+				return $this->sb . ' SB';
+			case 'cs':
+				return $this->cs . ' CS';
+			case 'bb':
+				return $this->bb . ' BB';
+			case 'k':
+				return $this->so . ' K';
+			default:
+				return '';
+		}
+	}
 }
 
 /*
