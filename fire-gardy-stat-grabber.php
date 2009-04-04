@@ -3,9 +3,9 @@
 Plugin Name: FireGardy Stat Grabber
 Plugin URI: http://stat-grabber.firegardy.com
 Description: Download a player's stats from Baseball-Reference.com and display them on the page.
-Version: 0.1.2a
+Version: 0.2
 Author: Sean Schulte
-Author URI: http://seancode.blogspot.com
+Author URI: http://vikinghammer.com
 */
 
 // we need to use the parser
@@ -40,8 +40,10 @@ function fire_gardy_stat_grabber($playerName, $playerId, $year, $playerType='hit
 		$fetcher = new StatFetcher($playerId, $year, $playerType);
 		$playerStats = $fetcher->getStats();
 
-		// save it to the db
-		update_option($playerDbCode, $playerStats);
+        if ($playerStats) {
+            // save it to the db
+            update_option($playerDbCode, $playerStats);
+        }
 	}
 
 	// set up the default stats
@@ -62,26 +64,28 @@ function fire_gardy_stat_grabber($playerName, $playerId, $year, $playerType='hit
 	}
 
 	// display the stats
-	echo '<div class="fg_br_grabber">';
-	echo '<strong>' . $playerName . ', ' . $year . '</strong>';
-	echo '<br />';
-	foreach ($statsToDisplay as $stat) {
-		if (is_array($stat)) {
-			$comma = false;
-			foreach ($stat as $s) {
-				if ($comma) {
-					echo ', ';
-				} else {
-					$comma = true;
-				}
-				echo $playerStats->getString($s);
-			}
-		} else {
-			echo $playerStats->getString($stat);
-		}
-		echo '<br />';
-	}
-	echo '</div>';
+    if ($playerStats) {
+        echo '<div class="fg_br_grabber">';
+        echo '<strong>' . $playerName . ', ' . $year . '</strong>';
+        echo '<br />';
+        foreach ($statsToDisplay as $stat) {
+            if (is_array($stat)) {
+                $comma = false;
+                foreach ($stat as $s) {
+                    if ($comma) {
+                        echo ', ';
+                    } else {
+                        $comma = true;
+                    }
+                    echo $playerStats->getString($s);
+                }
+            } else {
+                echo $playerStats->getString($stat);
+            }
+            echo '<br />';
+        }
+        echo '</div>';
+    }
 }
 
 function fg_baseball_reference_css() {

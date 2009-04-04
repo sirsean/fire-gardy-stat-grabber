@@ -6,7 +6,7 @@ class PlayerStats {
 }
 
 class PitcherStats extends PlayerStats {
-	var $w, $l, $gs, $cg, $sho, $gf, $sv, $ip, $h, $r, $er, $hr, $bb, $so, $hbp, $wp, $bfp, $ibb, $bk, $era, $eraPlus, $whip;
+    var $w, $l, $winPerc, $era, $gs, $gf, $cg, $sho, $sv, $ip, $h, $r, $er, $hr, $bb, $k, $hbp, $bf, $eraPlus, $whip, $h9, $bb9, $k9, $kbb, $hr9;
 
 	/**
 	Translate a given stat string into a printable string.
@@ -50,17 +50,11 @@ class PitcherStats extends PlayerStats {
 			case 'bb':
 				return $this->bb . ' BB';
 			case 'k':
-				return $this->so . ' K';
+				return $this->k . ' K';
 			case 'hbp':
 				return $this->hbp . ' HBP';
-			case 'wp':
-				return $this->wp . ' WP';
-			case 'bfp':
-				return $this->bfp . ' BFP';
-			case 'ibb':
-				return $this->ibb . ' IBB';
-			case 'bk':
-				return $this->bk . ' BK';
+			case 'bp':
+				return $this->bp . ' BFP';
 			case 'era':
 				return $this->era . ' ERA';
 			case 'eraPlus':
@@ -149,7 +143,7 @@ class StatFetcher {
 		$this->year = $year;
 
 		// build the URL based on the format of the baseball-reference URLs
-		$this->url = 'http://www.baseball-reference.com/' . $playerCode[0] . '/' . $playerCode . '.shtml';
+		$this->url = 'http://www.baseball-reference.com/players/' . $playerCode[0] . '/' . $playerCode . '.shtml';
 
 		$this->playerType = $playerType;
 	}
@@ -172,15 +166,7 @@ class StatFetcher {
 	/**
 	Given a line containing a year's stats, parse it into a PitcherStats object.
 	*/
-	function parsePitcherStats($line) {
-		$arr = split(' ', $line);
-		$numbers = array();
-		foreach ($arr as $elem) {
-			if (is_numeric($elem)) {
-				$numbers[] = $elem;
-			}
-		}
-
+	function parsePitcherStats($numbers) {
 		$stats = new PitcherStats();
 		$stats->time = time();
 
@@ -188,27 +174,30 @@ class StatFetcher {
 		$stats->age = $numbers[1];
 		$stats->w = $numbers[2];
 		$stats->l = $numbers[3];
-		$stats->games = $numbers[4];
-		$stats->gs = $numbers[5];
-		$stats->cg = $numbers[6];
-		$stats->sho = $numbers[7];
+		$stats->winPerc = $numbers[4];
+		$stats->era = $numbers[5];
+		$stats->games = $numbers[6];
+		$stats->gs = $numbers[7];
 		$stats->gf = $numbers[8];
-		$stats->sv = $numbers[9];
-		$stats->ip = $numbers[10];
-		$stats->h = $numbers[11];
-		$stats->r = $numbers[12];
-		$stats->er = $numbers[13];
-		$stats->hr = $numbers[14];
-		$stats->bb = $numbers[15];
-		$stats->so = $numbers[16];
-		$stats->hbp = $numbers[17];
-		$stats->wp = $numbers[18];
-		$stats->bfp = $numbers[19];
-		$stats->ibb = $numbers[20];
-		$stats->bk = $numbers[21];
-		$stats->era = $numbers[22];
-		$stats->eraPlus = $numbers[24];
-		$stats->whip = $numbers[25];
+		$stats->cg = $numbers[9];
+		$stats->sho = $numbers[10];
+		$stats->sv = $numbers[11];
+		$stats->ip = $numbers[12];
+		$stats->h = $numbers[13];
+		$stats->r = $numbers[14];
+        $stats->er = $numbers[15];
+		$stats->hr = $numbers[16];
+		$stats->bb = $numbers[17];
+		$stats->k = $numbers[18];
+		$stats->hbp = $numbers[19];
+		$stats->bf = $numbers[20];
+		$stats->eraPlus = $numbers[21];
+		$stats->whip = $numbers[22];
+		$stats->h9 = $numbers[23];
+		$stats->bb9 = $numbers[24];
+		$stats->k9 = $numbers[25];
+        $stats->kbb = $numbers[26];
+        $stats->hr9 = $numbers[27];
 
 		return $stats;
 	}
@@ -216,36 +205,36 @@ class StatFetcher {
 	/**
 	Given a line containing a year's stats, parse them into a HitterStats object.
 	*/
-	function parseHitterStats($line) {
-		$arr = split(' ', $line);
-		$numbers = array();
-		foreach ($arr as $elem) {
-			if (is_numeric($elem)) {
-				$numbers[] = $elem;
-			}
-		}
-
+	function parseHitterStats($numbers) {
 		$stats = new HitterStats();
 		$stats->time = time();
 
 		$stats->year = $numbers[0];
 		$stats->age = $numbers[1];
 		$stats->games = $numbers[2];
-		$stats->ab = $numbers[3];
-		$stats->runs = $numbers[4];
-		$stats->hits = $numbers[5];
-		$stats->doubles = $numbers[6];
-		$stats->triples = $numbers[7];
-		$stats->hr = $numbers[8];
-		$stats->rbi = $numbers[9];
-		$stats->sb = $numbers[10];
-		$stats->cs = $numbers[11];
-		$stats->bb = $numbers[12];
-		$stats->so = $numbers[13];
-		$stats->ba = $numbers[14];
-		$stats->obp = $numbers[15];
-		$stats->slg = $numbers[16];
-		$stats->opsPlus = $numbers[17];
+        $stats->pa = $numbers[3];
+		$stats->ab = $numbers[4];
+		$stats->runs = $numbers[5];
+		$stats->hits = $numbers[6];
+		$stats->doubles = $numbers[7];
+		$stats->triples = $numbers[8];
+		$stats->hr = $numbers[9];
+		$stats->rbi = $numbers[10];
+		$stats->sb = $numbers[11];
+		$stats->cs = $numbers[12];
+		$stats->bb = $numbers[13];
+		$stats->so = $numbers[14];
+		$stats->ba = $numbers[15];
+		$stats->obp = $numbers[16];
+		$stats->slg = $numbers[17];
+        $stats->ops = $numbers[18];
+		$stats->opsPlus = $numbers[19];
+        $stats->tb = $numbers[20];
+        $stats->gidp = $numbers[21];
+        $stats->hbp = $numbers[22];
+        $stats->sh = $numbers[23];
+        $stats->sf = $numbers[24];
+        $stats->ibb = $numbers[25];
 
 		return $stats;
 	}
@@ -257,24 +246,39 @@ class StatFetcher {
 		$this->loadLines();
 
 		$batStat = false;
+        $stats = array();
 		foreach ($this->htmlLines as $line) {
-			if (($this->playerType == 'hitter') && strcasecmp('<div id="batStats">', trim($line)) == 0) {
+            if (($this->playerType == 'hitter') && preg_match("/id=\"batting_standard\.{$this->year}\"/", $line)) {
 				$batStat = true;
 				continue;
-			} else if (($this->playerType == 'pitcher') && strcasecmp('<div id="pitchStats">', trim($line)) == 0) {
+			} else if (($this->playerType == 'pitcher') && preg_match("/id=\"pitching_simple\.{$this->year}\"/", $line)) {
 				$pitchStat = true;
 				continue;
 			}
 
 			if ($batStat) {
-				if (preg_match("/year=\"{$this->year}\"/", $line)) {
-					return $this->parseHitterStats($line);
-				}
+                if (strcasecmp('</tr>', trim($line)) == 0) {
+                    $batStat = false;
+                    $hitterStats = $this->parseHitterStats($stats);
+                    return $hitterStats;
+                } else {
+                    $res = preg_match("/<td [^\>]*\>([\.\d]+)\<\/td\>/", $line, $matches);
+                    if ($res) {
+                        array_push($stats, $matches[1]);
+                    }
+                }
 			}
 			if ($pitchStat) {
-				if (preg_match("/year=\"{$this->year}\"/", $line)) {
-					return $this->parsePitcherStats($line);
-				}
+                if (strcasecmp('</tr>', trim($line)) == 0) {
+                    $pitchStat = false;
+                    $pitcherStats = $this->parsePitcherStats($stats);
+                    return $pitcherStats;
+                } else {
+                    $res = preg_match("/<td [^>]*><?e?m?>?([\.\d]+)<?\/?e?m?>?<\/td>/", $line, $matches);
+                    if ($res) {
+                        array_push($stats, $matches[1]);
+                    }
+                }
 			}
 		}
 	}
