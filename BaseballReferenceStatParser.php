@@ -262,7 +262,7 @@ class StatFetcher {
                     $hitterStats = $this->parseHitterStats($stats);
                     return $hitterStats;
                 } else {
-                    $res = preg_match("/<td [^\>]*\>([\.\d]+)\<\/td\>/", $line, $matches);
+                    $res = preg_match("/<td [^\>]*\><?s?t?r?o?n?g?>?<?e?m?>?([\.\d]+)<?\/?e?m?>?<?\/?s?t?r?o?n?g?>?\<\/td\>/", $line, $matches);
                     if ($res) {
                         array_push($stats, $matches[1]);
                     }
@@ -274,7 +274,7 @@ class StatFetcher {
                     $pitcherStats = $this->parsePitcherStats($stats);
                     return $pitcherStats;
                 } else {
-                    $res = preg_match("/<td [^>]*><?e?m?>?([\.\d]+)<?\/?e?m?>?<\/td>/", $line, $matches);
+                    $res = preg_match("/<td [^>]*><?s?t?r?o?n?g?>?<?e?m?>?([\.\d]+)<?\/?e?m?>?<?\/?s?t?r?o?n?g?>?<\/td>/", $line, $matches);
                     if ($res) {
                         array_push($stats, $matches[1]);
                     }
